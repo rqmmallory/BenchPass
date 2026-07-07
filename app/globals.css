@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 antialiased;
+  /* Keep the FAB and bottom actions clear of iOS home indicator */
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@layer components {
+  .input {
+    @apply w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-base
+      shadow-sm placeholder:text-slate-400
+      focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/25
+      disabled:cursor-not-allowed disabled:bg-slate-100;
+  }
+
+  .btn-primary {
+    @apply inline-flex min-h-[48px] items-center justify-center gap-2 rounded-xl
+      bg-brand-600 px-5 py-3 text-base font-semibold text-white shadow-sm
+      transition active:scale-[.98] hover:bg-brand-700
+      focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2
+      focus-visible:outline-brand-600 disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-secondary {
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl
+      border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold
+      text-slate-700 shadow-sm transition active:scale-[.98] hover:bg-slate-50
+      focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2
+      focus-visible:outline-brand-600 disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .card {
+    @apply rounded-2xl border border-slate-200 bg-white shadow-card;
+  }
+
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-slate-700;
+  }
+
+  .skeleton {
+    @apply relative overflow-hidden rounded-lg bg-slate-200/70
+      after:absolute after:inset-0 after:-translate-x-full
+      after:bg-gradient-to-r after:from-transparent after:via-white/60 after:to-transparent
+      after:animate-shimmer;
+  }
+}
+
+/* Print: only the tag sheet renders (see /tickets/[id]/tag) */
+@media print {
+  body {
+    background: white;
+    padding: 0;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
