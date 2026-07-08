@@ -87,6 +87,7 @@ export function TicketDetail(props: TicketDetailProps) {
   const [templateKey, setTemplateKey] = useState<TemplateKey | "custom">("received");
   const [messageBody, setMessageBody] = useState(templates.received);
   const [sending, setSending] = useState<"sms" | "email" | null>(null);
+  const [personalizing, setPersonalizing] = useState(false);
   const messagePanelRef = useRef<HTMLDivElement>(null);
 
   const disabled = !writable;
@@ -155,6 +156,27 @@ export function TicketDetail(props: TicketDetailProps) {
       toast("AI unavailable — write a summary manually", "error");
     } finally {
       setAiRunning(false);
+    }
+  }
+
+  async function personalizeMessage() {
+    if (!messageBody.trim()) return;
+    setPersonalizing(true);
+    try {
+      const res = await fetch("/api/ai/personalize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ticket_id: props.ticket.id, body: messageBody.trim() }),
+      });
+      const data = (await res.json().catch(() => null)) as
+        | { body?: string; error?: string }
+        | null;
+      if (!res.ok || !data?.body) throw new Error(data?.error ?? "AI unavailable");
+      setMessageBody(data.body);
+    } catch {
+      toast("AI unavailable — the message is still editable", "error");
+    } finally {
+      setPersonalizing(false);
     }
   }
 
@@ -461,9 +483,17 @@ export function TicketDetail(props: TicketDetailProps) {
         <textarea
           className="input min-h-[100px]"
           value={messageBody}
-          disabled={disabled}
+          disabled={disabled || personalizing}
           onChange={(e) => setMessageBody(e.target.value)}
         />
+        <button
+          type="button"
+          disabled={disabled || personalizing || !messageBody.trim()}
+          onClick={() => void personalizeMessage()}
+          className="mt-1.5 text-xs font-medium text-brand-600 disabled:opacity-50"
+        >
+          {personalizing ? "Personalising…" : "✨ Personalise →"}
+        </button>
         <div className="mt-3 flex gap-2">
           <button
             type="button"

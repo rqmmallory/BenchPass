@@ -62,6 +62,9 @@ export async function PATCH(
     update.status = body.status;
     if (body.status === "ready") update.ready_at = new Date().toISOString();
     if (body.status === "picked_up") update.picked_up_at = new Date().toISOString();
+    // Moving backward clears stale milestones so board age nudges stay honest.
+    if (body.status !== "picked_up") update.picked_up_at = null;
+    if (body.status !== "ready" && body.status !== "picked_up") update.ready_at = null;
   }
 
   const problem = optionalText(body.problem, 4000);
